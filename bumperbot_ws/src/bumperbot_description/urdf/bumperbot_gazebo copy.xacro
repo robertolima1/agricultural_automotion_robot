@@ -1,0 +1,1296 @@
+<?xml version="1.0"?>
+
+<robot name="bumperbot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <transmission name="wheel_right_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel_right_joint" >
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel_right_motor" >
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="wheel_left_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel_left_joint" >
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel_left_motor" >
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <gazebo reference="wheel_left_link">
+    <mu1>1000000000000000.0</mu1>
+    <mu2>1000000000000000.0</mu2>
+    <kp>1000000000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+  </gazebo>
+
+  <gazebo reference="wheel_right_link">
+    <mu1>1000000000000000.0</mu1>
+    <mu2>1000000000000000.0</mu2>
+    <kp>1000000000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
+  </gazebo>
+  
+  <gazebo reference="caster_rear_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+  
+  <gazebo reference="caster_front_link">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+
+  <!-- ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+  <!-- IMU -->
+  <gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>imu_link</bodyName>
+      <frameName>imu_link</frameName>
+      <topicName>imu</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.001</gaussianNoise>
+      <updateRate>1000</updateRate>
+    </plugin>
+  </gazebo>
+
+  <!--for the RFID_tags plugin:-->
+  <gazebo reference="base_link">
+     <sensor type="rfid" name="rfid_tags">
+       <plugin name="rfid_tags" filename="libRFID_tag_plugin.so">
+         <tag_name>rfid_tag</tag_name>
+         <parent_frame>odom_sim</parent_frame>
+         <tags_per_fix>5</tags_per_fix>
+         <fix_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/normal_size_fixture/model.sdf</fix_sdf_path>
+         <tag_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/antenna_1/model.sdf</tag_sdf_path>
+       </plugin>
+     </sensor>
+  </gazebo>
+<gazebo reference="base_link">
+   <sensor type="rfid" name="rfid_antenna">
+     <plugin name="rfid_antenna" filename="libRFID_antenna_plugin.so">
+       <antenna_name>antenna_1</antenna_name>
+       <tag_name>rfid_tag_1</tag_name>
+       <detected_tag_name>rfid_tag_1</detected_tag_name>
+       <detected_tag_colour>blue</detected_tag_colour>
+       <antenna_id>1</antenna_id>
+       <azimuth_beamwidth>1</azimuth_beamwidth>
+       <elevation_beamwidth>1</elevation_beamwidth>
+       <rzero>2</rzero>
+       <tag_yellow_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_3/model.sdf</tag_yellow_sdf_path>
+      <tag_red_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_2/model.sdf</tag_red_sdf_path>
+      <tag_blue_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_5/model.sdf</tag_blue_sdf_path>
+      <tag_purple_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_4/model.sdf</tag_purple_sdf_path>
+
+     </plugin>
+   </sensor>
+</gazebo>
+
+  <!-- ===================== FILEIRA 0 ===================== -->
+  <link name="row_0">
+    <inertial>
+      <origin xyz="1.0 -1.2 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <!-- box 8.0 x 0.25 x 0.05 (kg·m²) -->
+      <inertia ixx="5.416666666666667e-04" ixy="0" ixz="0"
+               iyy="5.333541666666667e-01" iyz="0"
+               izz="5.338541666666667e-01"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 -1.2 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+      <material name="Soil"><color rgba="0.36 0.25 0.20 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 -1.2 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+    </collision>
+  </link>
+  <joint name="row_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="row_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===================== FILEIRA 1 ===================== -->
+  <link name="row_1">
+    <inertial>
+      <origin xyz="1.0 -0.4 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia ixx="5.416666666666667e-04" ixy="0" ixz="0"
+               iyy="5.333541666666667e-01" iyz="0"
+               izz="5.338541666666667e-01"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 -0.4 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+      <material name="Soil"><color rgba="0.36 0.25 0.20 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 -0.4 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+    </collision>
+  </link>
+  <joint name="row_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="row_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===================== FILEIRA 2 ===================== -->
+  <link name="row_2">
+    <inertial>
+      <origin xyz="1.0 0.4 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia ixx="5.416666666666667e-04" ixy="0" ixz="0"
+               iyy="5.333541666666667e-01" iyz="0"
+               izz="5.338541666666667e-01"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 0.4 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+      <material name="Soil"><color rgba="0.36 0.25 0.20 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 0.4 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+    </collision>
+  </link>
+  <joint name="row_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="row_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ===================== FILEIRA 3 ===================== -->
+  <link name="row_3">
+    <inertial>
+      <origin xyz="1.0 1.2 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia ixx="5.416666666666667e-04" ixy="0" ixz="0"
+               iyy="5.333541666666667e-01" iyz="0"
+               izz="5.338541666666667e-01"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 1.2 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+      <material name="Soil"><color rgba="0.36 0.25 0.20 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 1.2 0" rpy="0 0 0"/>
+      <geometry><box size="8.0 0.25 0.05"/></geometry>
+    </collision>
+  </link>
+  <joint name="row_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="row_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- =========== PLANTAS (cilindro r=0.05, L=0.2, m=0.01) =========== -->
+  <!-- Inércia: Ixx=Iyy=3.958333333e-05; Izz=1.25e-05 -->
+
+  <!-- PLANTA 0 FILEIRA 0 -->
+  <link name="plant_0_0">
+    <inertial>
+      <origin xyz="0.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_0_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_0_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- PINGERS (cilindro r=0.03, L=0.2, m=0.005) -->
+  <!-- Inércia: Ixx=Iyy=1.7791666667e-05; Izz=2.25e-06 -->
+
+  <!-- ================= FILEIRA Y = -0.4 ================= -->
+  <link name="pinger_0_0">
+    <inertial>
+      <origin xyz="-0.5 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_0_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_0_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_1_0">
+    <inertial>
+      <origin xyz="0.5 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_1_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_1_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_2_0">
+    <inertial>
+      <origin xyz="1.5 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_2_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_2_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_3_0">
+    <inertial>
+      <origin xyz="2.5 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_3_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_3_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_4_0">
+    <inertial>
+      <origin xyz="3.5 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.5 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_4_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_4_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ================= FILEIRA Y = 0.4 ================= -->
+  <link name="pinger_0_1">
+    <inertial>
+      <origin xyz="-0.5 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_0_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_0_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_1_1">
+    <inertial>
+      <origin xyz="0.5 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_1_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_1_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_2_1">
+    <inertial>
+      <origin xyz="1.5 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_2_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_2_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_3_1">
+    <inertial>
+      <origin xyz="2.5 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_3_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_3_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_4_1">
+    <inertial>
+      <origin xyz="3.5 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.5 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_4_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_4_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ================= FILEIRA Y = 1.2 ================= -->
+  <link name="pinger_0_2">
+    <inertial>
+      <origin xyz="-0.5 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_0_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_0_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_1_2">
+    <inertial>
+      <origin xyz="0.5 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_1_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_1_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_2_2">
+    <inertial>
+      <origin xyz="1.5 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_2_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_2_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_3_2">
+    <inertial>
+      <origin xyz="2.5 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_3_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_3_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_4_2">
+    <inertial>
+      <origin xyz="3.5 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.5 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_4_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_4_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ================= FILEIRA Y = -1.2 ================= -->
+  <link name="pinger_0_3">
+    <inertial>
+      <origin xyz="-0.5 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_0_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_0_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_1_3">
+    <inertial>
+      <origin xyz="0.5 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_1_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_1_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_2_3">
+    <inertial>
+      <origin xyz="1.5 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_2_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_2_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_3_3">
+    <inertial>
+      <origin xyz="2.5 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_3_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_3_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="pinger_4_3">
+    <inertial>
+      <origin xyz="3.5 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.005"/>
+      <inertia ixx="1.779166666666667e-05" ixy="0" ixz="0"
+               iyy="1.779166666666667e-05" iyz="0"
+               izz="2.250000000000000e-06"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+      <material name="Pinger"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.5 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.03" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="pinger_4_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="pinger_4_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ========= PLANTAS RESTANTES (copiadas com inertial/collision) ========= -->
+
+  <!-- PLANTA 1 FILEIRA 0 -->
+  <link name="plant_1_0">
+    <inertial>
+      <origin xyz="1.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_1_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_1_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- PLANTA 2 FILEIRA 0 -->
+  <link name="plant_2_0">
+    <inertial>
+      <origin xyz="2.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_2_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_2_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- PLANTA 3 FILEIRA 0 -->
+  <link name="plant_3_0">
+    <inertial>
+      <origin xyz="3.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_3_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_3_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- PLANTA 4 FILEIRA 0 -->
+  <link name="plant_4_0">
+    <inertial>
+      <origin xyz="4.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="4.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="4.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_4_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_4_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- PLANTA 5 FILEIRA 0 -->
+  <link name="plant_5_0">
+    <inertial>
+      <origin xyz="-1.0 -0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="-1.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-1.0 -0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_5_0_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_5_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==== FILEIRA 1 (y=0.4) ==== -->
+  <link name="plant_0_1">
+    <inertial>
+      <origin xyz="0.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_0_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_0_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_1_1">
+    <inertial>
+      <origin xyz="1.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_1_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_1_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_2_1">
+    <inertial>
+      <origin xyz="2.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_2_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_2_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_3_1">
+    <inertial>
+      <origin xyz="3.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_3_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_3_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_4_1">
+    <inertial>
+      <origin xyz="4.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="4.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="4.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_4_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_4_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_5_1">
+    <inertial>
+      <origin xyz="-1.0 0.4 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="-1.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-1.0 0.4 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_5_1_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_5_1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==== FILEIRA 2 (y=1.2) ==== -->
+  <link name="plant_0_2">
+    <inertial>
+      <origin xyz="0.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_0_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_0_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_1_2">
+    <inertial>
+      <origin xyz="1.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_1_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_1_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_2_2">
+    <inertial>
+      <origin xyz="2.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_2_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_2_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_3_2">
+    <inertial>
+      <origin xyz="3.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_3_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_3_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_4_2">
+    <inertial>
+      <origin xyz="4.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="4.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="4.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_4_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_4_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_5_2">
+    <inertial>
+      <origin xyz="-1.0 1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="-1.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-1.0 1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_5_2_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_5_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==== FILEIRA 3 (y=-1.2) ==== -->
+  <link name="plant_0_3">
+    <inertial>
+      <origin xyz="0.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_0_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_0_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_1_3">
+    <inertial>
+      <origin xyz="1.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="1.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="1.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_1_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_1_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_2_3">
+    <inertial>
+      <origin xyz="2.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="2.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="2.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_2_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_2_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_3_3">
+    <inertial>
+      <origin xyz="3.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="3.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="3.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_3_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_3_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_4_3">
+    <inertial>
+      <origin xyz="4.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="4.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="4.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_4_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_4_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="plant_5_3">
+    <inertial>
+      <origin xyz="-1.0 -1.2 0.1" rpy="0 0 0"/>
+      <mass value="0.01"/>
+      <inertia ixx="3.958333333333334e-05" ixy="0" ixz="0"
+               iyy="3.958333333333334e-05" iyz="0"
+               izz="1.250000000000000e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="-1.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+      <material name="Plant"><color rgba="0.0 0.6 0.0 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-1.0 -1.2 0.1" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.05" length="0.2"/></geometry>
+    </collision>
+  </link>
+  <joint name="plant_5_3_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="plant_5_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+</robot>

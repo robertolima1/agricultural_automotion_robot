@@ -1,0 +1,94 @@
+# ===============================
+# ROS1 / Catkin Workspace Ignore
+# ===============================
+
+# Build e devel directories
+build/
+devel/
+devel_isolated/
+build_isolated/
+logs/
+install/
+install_isolated/
+
+# Catkin & colcon artifacts
+catkin_generated/
+CMakeFiles/
+CMakeCache.txt
+CTestTestfile.cmake
+cmake_install.cmake
+*.cmake
+*.pc
+Makefile
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.eggs/
+.env/
+.venv/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Arquivos temporários e logs
+*.log
+*.tmp
+*.temp
+*.old
+*.out
+*.bak
+
+# Arquivos de execução ou simulação
+*.bag
+*.launch~
+*.sdf~
+*.urdf~
+*.gazebo/
+*.world~
+*.dae~
+*.stl~
+
+# ROS metadata
+.msg/
+.srv/
+.action/
+.catkin_tools/
+.rosinstall
+rosdep.yaml
+CATKIN_IGNORE
+
+# Output de simulação e caches
+*.csv
+*.dat
+*.db
+*.sqlite
+*.cache
+*.pid
+*.so
+*.o
+*.a
+
+# Outros comuns
+.DS_Store
+Thumbs.db
+
+# Ignore arquivos locais de configuração
+local_setup.*
+setup.*
+env.sh
+env.bat
+
+# Custom user files (ajuste conforme seu projeto)
+notebooks/
+tmp/
+results/
+*Test*
