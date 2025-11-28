@@ -6,9 +6,9 @@
     <p>This package contains configuration data, 3D models and launch files
 for bumperbot_description robot</p>
   </description>
-  <author email="antonio.brandi@outlook.it">Antonio Brandi</author>
+  <author email="roberto.lima@aluno.cefet-rj.br">Roberto Gomes de Lima</author>
   <license>Apache License, Version 2.0</license>
-  <maintainer email="antonio.brandi@outlook.it">Antonio Brandi</maintainer>
+  <maintainer email="roberto.lima@aluno.cefet-rj.br">Roberto Gomes de Lima</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
 

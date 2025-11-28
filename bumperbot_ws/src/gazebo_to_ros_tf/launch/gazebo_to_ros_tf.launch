@@ -15,18 +15,22 @@
 		type="static_transform_publisher"
 		name="base_link_to_antenna_publisher1"
 		args="0.12 0 0.5 0 0 0 base_link antenna_1 100" />
-	<node pkg="tf" type="static_transform_publisher" name="world_to_rfid_tag1"
-        args="2.0 0.5 0.0 0 0 0 world rfid_tag1 100"/>
-	<!--		
 	<node pkg="tf"
 		type="static_transform_publisher"
-		name="base_link_to_antenna_publisher1"
-		args="-0.12 0 0.5 3.14 0 0 base_link_sim antenna_2 100" />
+		name="base_link_to_antenna_publisher2"
+		args="-0.12 0 0.5 3.14 0 0 base_link antenna_2 100" />
 	<node pkg="tf"
 		type="static_transform_publisher"
 		name="base_link_to_antenna_publisher3"
-		args="0 0.12 0.5 1.57 0 0 base_link_sim antenna_3 100" />
-	<node pkg="tf"
+		args="0 0.12 0.5 1.57 0 0 base_link antenna_3 100" /> 
+	<node pkg="tf" type="static_transform_publisher" name="world_to_rfid_tag1"
+        args="2.0 0.5 0.0 0 0 0 world rfid_tag1 100"/>
+	 <node pkg="tf" type="static_transform_publisher" name="world_to_rfid_tag2"
+        args="2.0 0.5 0.0 0 0 0 world rfid_tag2 100"/>
+	<node pkg="tf" type="static_transform_publisher" name="world_to_rfid_tag3"
+        args="2.0 0.5 0.0 0 0 0 world rfid_tag3 100"/>
+			
+	<!--
 		type="static_transform_publisher"
 		name="base_link_to_antenna_publisher4"
 		args="0 -0.12 0.5 -1.57 0 0 base_link_sim antenna_4 100" />-->

@@ -14,7 +14,6 @@
 #include <iostream>
 #include <sensor_msgs/Imu.h>
 #include <map>
-#include <vector>
 
 #define MAX_TAGS 25
 #define MAX_DETECTION_RANGE 10
@@ -108,10 +107,6 @@ struct Point
     float x, y;
 };
 
-Point A = {0, 0};      // antena 1
-Point B = {4, 0};      // antena 2
-Point C = {2, 3};      // antena 3
-
 class Antenna
 {
 public:
@@ -172,7 +167,7 @@ public:
         return _x_arg;
     }
 
-    Point trilateration_euclidian(float distance_x1, float distance_x2, float distance_x3, Point p1, Point p2, Point p3)
+    double trilateration_euclidian(float distance_x1, float distance_x2, float distance_x3, Point p1, Point p2, Point p3)
     {
 
         float A = 2 * (p2.x - p1.x);
@@ -182,7 +177,7 @@ public:
         float E = 2 * (p3.y - p2.y);
         float F = distance_x2 * distance_x2 - distance_x3 * distance_x3 - p2.x * p2.x + p3.x * p3.x - p2.y * p2.y + p3.y * p3.y;
 
-        Point result;
+        Ponto result;
         result.x = (C * E - F * B) / (E * A - B * D);
         result.y = (C * D - A * F) / (B * D - A * E);
         return result;
@@ -359,6 +354,7 @@ public:
         tf2_ros::TransformListener listen(tfBuffer);
         geometry_msgs::TransformStamped tf;
         ros::Rate rate(20.0);
+        std::map<std::string, float> dist_by_antenna_tag;
 
         while (node.ok())
         {
@@ -377,19 +373,15 @@ public:
                          msg->orientation.x,
                          msg->orientation.y,
                          msg->orientation.z);
-                source_frame = "rfid_tag";
-
-                // target_frame = "antenna_" + to_string(i);
-                for (int idx = 1; idx < MAX_TAGS; idx++)
+                for (int i = 1; i <= 3; i++)
                 {
-                    std::vector<int> dist_by_antenna;
-                    rate.sleep();
-                    int aux_count = 0;
-                    for (int i = 1; i <= 1; i++)
+                    antenna_id = i;
+                    target_frame = "antenna_" + to_string(i);
+                    source_frame = "rfid_tag";
+
+                    // target_frame = "antenna_" + to_string(i);
+                    for (int idx = 1; idx < MAX_TAGS; idx++)
                     {
-                        aux_count ++;
-                        antenna_id = i;
-                        target_frame = "antenna_" + to_string(i);
                         // tf = tfBuffer.lookupTransform(target_frame + to_string(antenna_id), source_frame+ to_string(idx+1),ros::Time(0));
                         printf("\n[INFO] Antena ID:  %d:\n", antenna_id);
                         printf("\n[INFO] Target Frame:  %s:\n", target_frame.c_str());
@@ -414,7 +406,7 @@ public:
                                 printf("  -> Ângulo H: %.3f | Ângulo V: %.3f\n", call_elevation_h, call_elevation_v);
                                 if (antenna.pdf_threshold(pdf) && !tag[idx].spawned)
                                 {
-                                    //dist_by_antenna.push_back(dist);
+                                    dist_by_antenna_tag[target_frame + "_" + source_frame + +to_string(idx)] = dist;
                                     printf("[Antenna %d Tag %d at has a probability of %lf", i, idx, pdf);
                                     printf("Horizontal call_elevation angle: %lf, Vertical call_elevation angle %lf", call_elevation_h, call_elevation_v);
                                     // Verificar sobre sobre modificar tag que foi detectada (Pulverizada)   spawn_tag(&tag[idx], spawn, get_colour_from_sdf());
@@ -433,9 +425,6 @@ public:
                         }
                         rate.sleep();
                     }
-                    if(aux_count == 3){                       
-                      //  antenna.trilateration_euclidian(dist_by_antenna[0],dist_by_antenna[1] ,dist_by_antenna[2], A, B, C );
-                    }
                 }
 
                 // Cálculo de Posicionamento de Tag Por Trilateração
@@ -445,6 +434,11 @@ public:
                 ROS_ERROR("%s", ex.what());
                 ros::Duration(1.0).sleep();
                 continue;
+            }
+
+            for (const auto &[key, value] : dist_by_antenna_tag)
+            {
+                std::cout << key << " => " << value << " m" << std::endl;
             }
         }
     }

@@ -4,9 +4,9 @@
   <version>0.0.0</version>
   <description>The bumperbot_localization package</description>
 
-  <maintainer email="antonio.brandi@outlook.it">Antonio Brandi</maintainer>
+  <maintainer email="roberto.lima@aluno.cefet-rj.br">Roberto Gomes de Lima</maintainer>
   <license>BSD</license>
-  <author email="antonio.brandi@outlook.it">Antonio Brandi</author>
+  <author email="roberto.lima@aluno.cefet-rj.br">Roberto Gomes de Lima</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

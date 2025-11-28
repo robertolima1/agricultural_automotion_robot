@@ -90,8 +90,8 @@
          <tag_name>rfid_tag</tag_name>
          <parent_frame>world</parent_frame>
          <tags_per_fix>5</tags_per_fix>
-         <fix_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/normal_size_fixture/model.sdf</fix_sdf_path>
-         <tag_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/antenna_1/model.sdf</tag_sdf_path>
+         <fix_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/normal_size_fixture/model.sdf</fix_sdf_path>
+         <tag_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/antenna_1/model.sdf</tag_sdf_path>
        </plugin>
      </sensor>  
   </gazebo>
@@ -101,18 +101,61 @@
        <antenna_name>antenna_1</antenna_name>
        <tag_name>rfid_tag1</tag_name>
        <detected_tag_name>rfid_tag_1</detected_tag_name>
-       <detected_tag_colour>blue</detected_tag_colour>
+      <bodyName>antenna_1_link</bodyName>
+      <frameName>antenna_1_link</frameName>
+       <!-- <detected_tag_colour>blue</detected_tag_colour> -->
        <antenna_id>1</antenna_id>
        <azimuth_beamwidth>1</azimuth_beamwidth>
        <elevation_beamwidth>1</elevation_beamwidth>
        <rzero>2</rzero>
-       <tag_yellow_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/RFID_3/model.sdf</tag_yellow_sdf_path>
-      <tag_red_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/RFID_2/model.sdf</tag_red_sdf_path>
-      <tag_blue_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/RFID_5/model.sdf</tag_blue_sdf_path>
-      <tag_purple_sdf_path>/home/ropingoold/agricultural_automotion_robot/bumperbot_ws/src/bumperbot_description/models/RFID_4/model.sdf</tag_purple_sdf_path>
+       <tag_yellow_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_3/model.sdf</tag_yellow_sdf_path>
+      <tag_red_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_2/model.sdf</tag_red_sdf_path>
+      <tag_blue_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_5/model.sdf</tag_blue_sdf_path>
+      <tag_purple_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_4/model.sdf</tag_purple_sdf_path>
 
      </plugin>
    </sensor>
 </gazebo>
-  
+
+<gazebo reference="base_link">
+      <sensor type="rfid" name="rfid_antenna_2">
+     <plugin name="rfid_antenna_2" filename="libRFID_antenna_plugin.so">
+       <antenna_name>antenna_2</antenna_name>
+        <bodyName>antenna_2_link</bodyName>
+      <frameName>antenna_2_link</frameName>
+       <tag_name>rfid_tag2</tag_name>
+       <detected_tag_name>rfid_tag_2</detected_tag_name>
+       <!-- <detected_tag_colour>red</detected_tag_colour> -->
+       <antenna_id>2</antenna_id>
+       <azimuth_beamwidth>1</azimuth_beamwidth>
+       <elevation_beamwidth>1</elevation_beamwidth>
+       <rzero>2</rzero>
+       <tag_yellow_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_3/model.sdf</tag_yellow_sdf_path>
+      <tag_red_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_2/model.sdf</tag_red_sdf_path>
+      <tag_blue_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_5/model.sdf</tag_blue_sdf_path>
+      <tag_purple_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_4/model.sdf</tag_purple_sdf_path>
+
+     </plugin>
+   </sensor>
+</gazebo>
+   <gazebo reference="base_link">
+      <sensor type="rfid" name="rfid_antenna_3">
+     <plugin name="rfid_antenna_3" filename="libRFID_antenna_plugin.so">
+       <antenna_name>antenna_3</antenna_name>
+       <tag_name>rfid_tag3</tag_name>
+        <bodyName>antenna_3_link</bodyName>
+      <frameName>antenna_3_link</frameName>
+       <detected_tag_name>rfid_tag_3</detected_tag_name>
+       <!-- <detected_tag_colour>yellow</detected_tag_colour> -->
+       <antenna_id>3</antenna_id>
+       <azimuth_beamwidth>1</azimuth_beamwidth>
+       <elevation_beamwidth>1</elevation_beamwidth>
+       <rzero>2</rzero>
+       <tag_yellow_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_3/model.sdf</tag_yellow_sdf_path>
+      <tag_red_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_2/model.sdf</tag_red_sdf_path>
+      <tag_blue_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_5/model.sdf</tag_blue_sdf_path>
+      <tag_purple_sdf_path>/home/ropingoold/Self-Driving-and-ROS-Learn-by-Doing-Odometry-Control/Section11_Sensor-Fusion/bumperbot_ws/src/bumperbot_description/models/RFID_4/model.sdf</tag_purple_sdf_path>
+     </plugin>
+   </sensor> 
+</gazebo>
 </robot>
